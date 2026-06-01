@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>카카오 맵 맛집 지도</title>
+    <style>
+        /* 지도가 표현될 영역의 크기 */
+        #map {
+            width: 100%;
+            height: 600px;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>영남이공대 근방 맛집 지도</h2>
+    <div id="map"></div>
+
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=f6cf8a44630c5c5cf54c79196d47d060"></script>
+
+    <script>
+        // 1. 지도 초기화 (중심 좌표를 영남이공대 근처로 변경)
+        var container = document.getElementById('map'); 
+        var options = { 
+            center: new kakao.maps.LatLng(35.8455, 128.5885), 
+            level: 4 
+        };
+        var map = new kakao.maps.Map(container, options);
+
+        // 2. 아까 만든 영남이공대 근방 맛집 데이터 20개 배열
+        var storeData = [
+          {"id": 1, "name": "우야지막창 영대점", "latitude": 35.8455, "longitude": 128.5898, "description": "막창을 주문하면 소시지, 계란말이, 된장라면, 팥빙수가 서비스"},
+          {"id": 2, "name": "픽벅 (PIGBUG)", "latitude": 35.8462, "longitude": 128.5895, "description": "육즙 가득하고 패티가 두툼한 영대병원 앞 대표 수제버거"},
+          {"id": 3, "name": "청학식당", "latitude": 35.8488, "longitude": 128.5912, "description": "백종원의 3대천왕에 소개된 시원하고 얼큰한 섞어탕 노포 맛집"},
+          {"id": 4, "name": "구공탄막창", "latitude": 35.8441, "longitude": 128.5823, "description": "초벌되어 나와 불향이 가득하고 쫄깃함이 일품인 대구 3대 막창"},
+          {"id": 5, "name": "오무하무 앞산점", "latitude": 35.8415, "longitude": 128.5880, "description": "주택개조풍의 감성 가득한 퓨전 양식당"},
+          {"id": 6, "name": "정담육 생고기", "latitude": 35.8448, "longitude": 128.5885, "description": "신선하고 찰진 한우 생고기와 육회를 즐길 수 있는 맛집"},
+          {"id": 7, "name": "덕담 (대명점)", "latitude": 35.8475, "longitude": 128.5862, "description": "뇨끼와 파스타가 맛있기로 유명한 아늑한 분위기 레스토랑"},
+          {"id": 8, "name": "헤즈업 영대병원점", "latitude": 35.8459, "longitude": 128.5908, "description": "디저트와 커피가 맛있는 깔끔한 인테리어의 카페"},
+          {"id": 9, "name": "수원본가갈비", "latitude": 35.8443, "longitude": 128.5891, "description": "양념 소갈비살과 안창살이 저렴하고 푸짐한 고깃집"},
+          {"id": 10, "name": "해바라기분식", "latitude": 35.8468, "longitude": 128.5880, "description": "푸짐한 양과 달콤매콤한 떡볶이, 튀김이 맛있는 분식집"},
+          {"id": 11, "name": "지구인", "latitude": 35.8452, "longitude": 128.5875, "description": "레트로한 감성과 가성비 좋은 안주로 인기 있는 술집"},
+          {"id": 12, "name": "각일병 영대병원점", "latitude": 35.8445, "longitude": 128.5878, "description": "신선한 해산물 안주와 함께 편안하게 술 한잔하기 좋은 포차"},
+          {"id": 13, "name": "한밀식당", "latitude": 35.8465, "longitude": 128.5915, "description": "집밥이 그리울 때 찾기 좋은 깔끔하고 정갈한 정식 백반"},
+          {"id": 14, "name": "영이공 돈까스", "latitude": 35.8471, "longitude": 128.5855, "description": "겉바속촉의 정석, 두툼한 수제 돈까스를 합리적인 가격에 파는 곳"},
+          {"id": 15, "name": "대명명가 국밥", "latitude": 35.8438, "longitude": 128.5902, "description": "진하고 깊은 국물에 고기가 듬뿍 들어간 24시 돼지국밥집"},
+          {"id": 16, "name": "짬뽕명가", "latitude": 35.8480, "longitude": 128.5888, "description": "불향 가득한 짬뽕과 바삭한 찹쌀탕수육이 일품인 중식당"},
+          {"id": 17, "name": "앞산베이커리 카페", "latitude": 35.8422, "longitude": 128.5865, "description": "매일 직접 굽는 신선한 빵과 탁 트인 뷰가 매력적인 베이커리"},
+          {"id": 18, "name": "이공대 백반", "latitude": 35.8478, "longitude": 128.5849, "description": "제육볶음과 김치찌개 세트가 대학생 주머니 사정에 딱 맞는 곳"},
+          {"id": 19, "name": "소담 스시", "latitude": 35.8460, "longitude": 128.5869, "description": "신선한 활어 초밥과 우동 세트를 정갈하게 제공하는 일식"},
+          {"id": 20, "name": "도란도란 닭갈비", "latitude": 35.8450, "longitude": 128.5858, "description": "매콤한 철판 닭갈비에 치즈 사리를 추가해 밥까지 볶아 먹는 맛집"}
+        ];
+
+        // 3. 반복문을 돌며 지도 위에 20개의 마커를 생성합니다.
+        storeData.forEach(function(store) {
+            // 마커가 표시될 위치 생성
+            var markerPosition = new kakao.maps.LatLng(store.latitude, store.longitude);
+
+            // 마커 생성
+            var marker = new kakao.maps.Marker({
+                position: markerPosition,
+                map: map // 지도가 표시될 객체 지정
+            });
+
+            // 마커에 마우스를 올렸을 때 맛집 이름이 보이도록 말풍선(InfoWindow) 생성
+            var infowindow = new kakao.maps.InfoWindow({
+                content: '<div style="padding:5px; font-size:12px; font-weight:bold;">' + store.name + '</div>'
+            });
+
+            // 마커에 마우스 오버/아웃 이벤트 등록
+            kakao.maps.event.addListener(marker, 'mouseover', function() {
+                infowindow.open(map, marker);
+            });
+            kakao.maps.event.addListener(marker, 'mouseout', function() {
+                infowindow.close();
+            });
+        });
+    </script>
+</body>
+</html>
